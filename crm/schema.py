@@ -38,9 +38,9 @@ class ProductInput(graphene.InputObjectType):
     stock = graphene.Int()
 
 class OrderInput(graphene.InputObjectType):
-    customerId = graphene.ID(required=True)
-    productIds = graphene.List(graphene.ID, required=True)
-    orderDate = graphene.DateTime()
+    customer_id = graphene.Int(required=True)
+    product_ids = graphene.List(graphene.Int, required=True)
+    order_date = graphene.DateTime()
 
 # Mutations
 class CreateCustomer(graphene.Mutation):
@@ -137,22 +137,22 @@ class CreateOrder(graphene.Mutation):
     def mutate(cls, root, info, input):
         errors = []
         try:
-            customer = Customer.objects.get(pk=input.customerId)
+            customer = Customer.objects.get(pk=input.customer_id)
         except Customer.DoesNotExist:
             errors.append("Invalid customer ID")
             return CreateOrder(order=None, message="Failed", errors=errors)
-        if not input.productIds:
+        if not input.product_ids:
             errors.append("At least one product must be selected")
             return CreateOrder(order=None, message="Failed", errors=errors)
-        products = Product.objects.filter(pk__in=input.productIds)
-        if products.count() != len(input.productIds):
+        products = Product.objects.filter(pk__in=input.product_ids)
+        if products.count() != len(input.product_ids):
             errors.append("One or more product IDs are invalid")
             return CreateOrder(order=None, message="Failed", errors=errors)
         total = sum([p.price for p in products])
         order = Order.objects.create(
             customer=customer,
             total_amount=total,
-            order_date=input.orderDate if input.orderDate else timezone.now()
+            order_date=input.order_date if input.order_date else timezone.now()
         )
         order.products.set(products)
         return CreateOrder(order=order, message="Order created", errors=None)
