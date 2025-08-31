@@ -1,12 +1,33 @@
+from crm.models import Product
+
+# Mutation for updating low-stock products
+class UpdateLowStockProducts(graphene.Mutation):
+    updated_products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @classmethod
+    def mutate(cls, root, info):
+        # Use Product from crm.models
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        updated = []
+        for product in low_stock_products:
+            product.stock += 10
+            product.save()
+            updated.append(product)
+        msg = f"Updated {len(updated)} products."
+        return UpdateLowStockProducts(updated_products=updated, message=msg)
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-from .models import Customer, Product, Order
+from .models import Customer, Order
 from .filters import CustomerFilter, ProductFilter, OrderFilter
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import re
+
+# import Product for UpdateLowStockProducts
+from crm.models import Product
 
 class CustomerType(DjangoObjectType):
     class Meta:
@@ -19,6 +40,23 @@ class ProductType(DjangoObjectType):
         model = Product
         filterset_class = ProductFilter
         interfaces = (graphene.relay.Node,)
+
+# Mutation for updating low-stock products
+class UpdateLowStockProducts(graphene.Mutation):
+    updated_products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @classmethod
+    def mutate(cls, root, info):
+        # Use Product from crm.models
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        updated = []
+        for product in low_stock_products:
+            product.stock += 10
+            product.save()
+            updated.append(product)
+        msg = f"Updated {len(updated)} products."
+        return UpdateLowStockProducts(updated_products=updated, message=msg)
 
 class OrderType(DjangoObjectType):
     class Meta:
@@ -168,6 +206,7 @@ class UpdateLowStockProducts(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info):
+        # Use Product from crm.models
         low_stock_products = Product.objects.filter(stock__lt=10)
         updated = []
         for product in low_stock_products:

@@ -1,11 +1,11 @@
 from celery import shared_task
-import datetime
+from datetime import datetime
 import requests
 
 @shared_task
-def generate_crm_report():
-    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_file = '/tmp/crm_report_log.txt'
+def generatecrmreport():
+    now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    log_file = '/tmp/crmreportlog.txt'
     query = '''
     query {
       customers { id }

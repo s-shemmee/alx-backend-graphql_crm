@@ -1,21 +1,24 @@
+
 import datetime
-import requests
+from gql.transport.requests import RequestsHTTPTransport
+from gql import gql, Client
 
 def log_crm_heartbeat():
     now = datetime.datetime.now().strftime('%d/%m/%Y-%H:%M:%S')
     log_line = f"{now} CRM is alive\n"
     with open('/tmp/crm_heartbeat_log.txt', 'a') as f:
         f.write(log_line)
-    # Optionally check GraphQL hello field
+    # Query GraphQL hello field to verify endpoint
     try:
-        response = requests.post(
-            'http://localhost:8000/graphql',
-            json={'query': '{ hello }'}
-        )
-        if response.status_code == 200:
-            pass  # Could log success/failure if desired
-    except Exception:
-        pass
+        transport = RequestsHTTPTransport(url='http://localhost:8000/graphql', verify=False)
+        client = Client(transport=transport, fetch_schema_from_transport=True)
+        query = gql('{ hello }')
+        result = client.execute(query)
+        with open('/tmp/crm_heartbeat_log.txt', 'a') as f:
+            f.write(f"{now} GraphQL hello: {result.get('hello', 'No response')}\n")
+    except Exception as e:
+        with open('/tmp/crm_heartbeat_log.txt', 'a') as f:
+            f.write(f"{now} GraphQL hello error: {e}\n")
 
 def update_low_stock():
         now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
