@@ -3,9 +3,9 @@ from datetime import datetime
 import requests
 
 @shared_task
-def generatecrmreport():
+def generate_crm_report():
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    log_file = '/tmp/crmreportlog.txt'
+    log_file = '/tmp/crm_report_log.txt'
     query = '''
     query {
       customers { id }

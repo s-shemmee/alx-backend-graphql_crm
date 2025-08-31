@@ -28,7 +28,7 @@ python manage.py crontab add
 ```
 
 ## Verify logs
-- Check `/tmp/crmreportlog.txt` for weekly reports.
+- Check `/tmp/crm_report_log.txt` for weekly reports.
 - Check `/tmp/crm_heartbeat_log.txt` for heartbeat logs.
 - Check `/tmp/low_stock_updates_log.txt` for stock updates.
 - Check `/tmp/customer_cleanup_log.txt` for customer cleanup.
