@@ -158,5 +158,36 @@ class Mutation(graphene.ObjectType):
     bulkCreateCustomers = BulkCreateCustomers.Field()
     createProduct = CreateProduct.Field()
     createOrder = CreateOrder.Field()
+    updateLowStockProducts = UpdateLowStockProducts.Field()
 
+# Mutation for updating low-stock products
+# Mutation for updating low-stock products
+class UpdateLowStockProducts(graphene.Mutation):
+    updated_products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @classmethod
+    def mutate(cls, root, info):
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        updated = []
+        for product in low_stock_products:
+            product.stock += 10
+            product.save()
+            updated.append(product)
+        msg = f"Updated {len(updated)} products."
+        return UpdateLowStockProducts(updated_products=updated, message=msg)
+class UpdateLowStockProducts(graphene.Mutation):
+    updated_products = graphene.List(ProductType)
+    message = graphene.String()
+
+    @classmethod
+    def mutate(cls, root, info):
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        updated = []
+        for product in low_stock_products:
+            product.stock += 10
+            product.save()
+            updated.append(product)
+        msg = f"Updated {len(updated)} products."
+        return UpdateLowStockProducts(updated_products=updated, message=msg)
 schema = graphene.Schema(query=Query, mutation=Mutation)
